@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in to Acme Corp</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #eef1f6;
+    --card-bg: #ffffff;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --primary: #2f5fd6;
+    --primary-dark: #234ab0;
+    --border: #d7dbe3;
+    --success: #1a7f37;
+    --success-bg: #e6f6ea;
+    --error: #c0392b;
+    --error-bg: #fdecea;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(20, 24, 40, 0.08), 0 2px 6px rgba(20, 24, 40, 0.06);
+    padding: 40px 36px;
+  }
+
+  .logo {
+    text-align: center;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.5px;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 28px 0;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fafbfc;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(47, 95, 214, 0.15);
+    background: #fff;
+  }
+
+  .row-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .row-between a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+
+  .row-between a:hover { text-decoration: underline; }
+
+  .remember {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    padding: 11px 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--primary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  button[type="submit"]:hover { background: var(--primary-dark); }
+  button[type="submit"]:disabled {
+    background: #9fb2e6;
+    cursor: default;
+  }
+
+  .signup-hint {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 20px;
+  }
+
+  .signup-hint a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  #result {
+    margin-top: 18px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    text-align: center;
+    display: none;
+  }
+
+  #result.success {
+    display: block;
+    color: var(--success);
+    background: var(--success-bg);
+    border: 1px solid rgba(26, 127, 55, 0.25);
+  }
+
+  #result.error {
+    display: block;
+    color: var(--error);
+    background: var(--error-bg);
+    border: 1px solid rgba(192, 57, 43, 0.25);
+  }
+
+  #result.pending {
+    display: block;
+    color: var(--muted);
+    background: #f2f3f6;
+    border: 1px solid var(--border);
+  }
+
+  /* --- Test harness panel --- */
+  #test-panel {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    width: 240px;
+    background: #1f2430;
+    color: #e7e9ee;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    z-index: 1000;
+  }
+
+  #test-panel h2 {
+    font-size: 12px;
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9aa4bf;
+    font-weight: 600;
+  }
+
+  #test-panel button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 6px;
+    padding: 7px 9px;
+    font-size: 12px;
+    font-family: inherit;
+    background: #2c3244;
+    color: #e7e9ee;
+    border: 1px solid #3a4157;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  #test-panel button:hover { background: #3a4157; }
+  #test-panel button:last-child { margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">ACME</div>
+  <h1>Sign in to Acme Corp</h1>
+
+  <form id="login-form" autocomplete="on">
+    <div class="field">
+      <label for="username">Username or email</label>
+      <input
+        type="text"
+        id="username"
+        name="username"
+        autocomplete="username"
+        placeholder="you@example.com"
+        aria-label="Username"
+        required
+        disabled
+      >
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        autocomplete="current-password"
+        placeholder="Enter your password"
+        aria-label="Password"
+        required
+        disabled
+      >
+    </div>
+
+    <div class="row-between">
+      <label class="remember">
+        <input type="checkbox" id="remember" name="remember" style="width:auto;">
+        Remember me
+      </label>
+      <a href="#" onclick="return false;">Forgot password?</a>
+    </div>
+
+    <button type="submit" id="submit-btn" disabled>Log In</button>
+
+    <div id="result" role="status" aria-live="polite"></div>
+  </form>
+
+  <div class="signup-hint">
+    Don't have an account? <a href="#" onclick="return false;">Sign up</a>
+  </div>
+</div>
+
+<div id="test-panel">
+  <h2>Password presets</h2>
+  <button type="button" data-preset="abc123">Weak (abc123)</button>
+  <button type="button" data-preset="Tr0ub4dor&amp;3xyz!">Strong (Tr0ub4dor&amp;3xyz!)</button>
+  <button type="button" data-preset="password123">Common breached (password123)</button>
+</div>
+
+<script>
+  (function () {
+    var form = document.getElementById('login-form');
+    var usernameInput = document.getElementById('username');
+    var passwordInput = document.getElementById('password');
+    var result = document.getElementById('result');
+    var submitBtn = document.getElementById('submit-btn');
+    var panel = document.getElementById('test-panel');
+
+    // Give the security extension a moment to finish analyzing the page before
+    // allowing any interaction that could trigger a form submit.
+    setTimeout(function () {
+      usernameInput.disabled = false;
+      passwordInput.disabled = false;
+      submitBtn.disabled = false;
+    }, 1500);
+
+    panel.addEventListener('click', function (event) {
+      var target = event.target.closest('button[data-preset]');
+      if (!target) return;
+      passwordInput.value = target.getAttribute('data-preset');
+      passwordInput.dispatchEvent(new Event('input', { bubbles: true }));
+      passwordInput.focus();
+    });
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      result.className = 'pending';
+      result.textContent = 'Signing in…';
+      submitBtn.disabled = true;
+
+      var delay = 300 + Math.random() * 500;
+
+      setTimeout(function () {
+        var username = document.getElementById('username').value.trim();
+        var password = passwordInput.value;
+        var ok = username.length > 0 && password.length > 0;
+
+        if (ok) {
+          result.className = 'success';
+          result.textContent = 'Login successful. Welcome back, ' + username + '!';
+        } else {
+          result.className = 'error';
+          result.textContent = 'Login failed. Please check your username and password.';
+        }
+
+        submitBtn.disabled = false;
+      }, delay);
+    });
+  })();
+</script>
+
+</body>
+</html>
